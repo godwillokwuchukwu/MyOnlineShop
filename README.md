@@ -45,65 +45,66 @@ What to Extract as a Data Storyteller:
 
 <li>Product Goals: Remove frictions (faster discovery, high order completion), highlight features (wallet, recommendations).</li>
 </ul>
-Why This Step Matters
+<h4>Why This Step Matters</h4>
 Data storytelling requires context; without it, data is noise. This grounds you in the "why" behind numbers e.g., retention matters in a low-trust market. It aligns work with goals, preventing irrelevant metrics and enabling resonant stories like "Personalization solves urban frustrations, boosting sales." It transforms analysts into business strategists, ensuring analyses drive outcomes.
 
 
-Step 2: Identifying Ten Key Metrics – Quantifying Success
+<h2>Step 2: Identifying Ten Key Metrics – Quantifying Success</h2>
 Informed by documentation, select ten metrics spanning customer behavior, operations, satisfaction, and growth. Brainstorm 20+, prioritize by goals, and define clearly with relevance. Use the SQL schema for computability.
 
 Here's a consolidated list of ten metrics, each with definition, schema sources, and importance:
+<ul>
+<li>Average Order Value (AOV) Definition: Total revenue ÷ number of orders (for delivered orders in a period). Columns: SELLER_ORDERS.TOTAL_AMOUNT, SELLER_ORDERS.ORDER_DATE, STATUS IN ('DELIVERED'). Why: Tied to +15% AOV goal; evaluates pricing, bundling, and recommendations for upselling.</li>
 
-Average Order Value (AOV) Definition: Total revenue ÷ number of orders (for delivered orders in a period). Columns: SELLER_ORDERS.TOTAL_AMOUNT, SELLER_ORDERS.ORDER_DATE, STATUS IN ('DELIVERED'). Why: Tied to +15% AOV goal; evaluates pricing, bundling, and recommendations for upselling.
+<li>Conversion Rate Definition: Orders placed ÷ sessions (proxy with unique buyers placing ≥1 order). Columns: BUYERS.BUYER_ID, BUYER_ORDERS.ORDER_ID, BUYER_ORDERS.STATUS. Why: Targets 90% order completion; measures UX effectiveness in reducing abandonment.</li>
 
-Conversion Rate Definition: Orders placed ÷ sessions (proxy with unique buyers placing ≥1 order). Columns: BUYERS.BUYER_ID, BUYER_ORDERS.ORDER_ID, BUYER_ORDERS.STATUS. Why: Targets 90% order completion; measures UX effectiveness in reducing abandonment.
+<li>Order Completion Rate Definition: Delivered orders ÷ all placed orders. Columns: SELLER_ORDERS.STATUS = 'DELIVERED'. Why: Builds trust by addressing delivery reliability; reduces churn.</li>
 
-Order Completion Rate Definition: Delivered orders ÷ all placed orders. Columns: SELLER_ORDERS.STATUS = 'DELIVERED'. Why: Builds trust by addressing delivery reliability; reduces churn.
+<li>Refund/Dispute Rate Definition: Orders with REFUNDED_TO_BUYER or DISPUTED ÷ total orders. Columns: ESCROW_WALLETS.STATUS. Why: KPI for trust; highlights vendor or logistics issues.</li>
 
-Refund/Dispute Rate Definition: Orders with REFUNDED_TO_BUYER or DISPUTED ÷ total orders. Columns: ESCROW_WALLETS.STATUS. Why: KPI for trust; highlights vendor or logistics issues.
+<li>Recommendation Uplift Definition: % lift in conversion for recommended users vs. control (proxy until flags exist). Columns: Event data flags; link to BUYER_ORDERS.STATUS. Why: Tied to 10% conversion increase from recommendations.</li>
 
-Recommendation Uplift Definition: % lift in conversion for recommended users vs. control (proxy until flags exist). Columns: Event data flags; link to BUYER_ORDERS.STATUS. Why: Tied to 10% conversion increase from recommendations.
+<li>Customer Retention Rate (12-month) Definition: Active buyers now who were active 12 months ago ÷ buyers 12 months ago. Columns: BUYERS.BUYER_ID, BUYER_ORDERS.ORDER_DATE. Why: Core goal (60% retention); justifies loyalty programs.</li>
 
-Customer Retention Rate (12-month) Definition: Active buyers now who were active 12 months ago ÷ buyers 12 months ago. Columns: BUYERS.BUYER_ID, BUYER_ORDERS.ORDER_DATE. Why: Core goal (60% retention); justifies loyalty programs.
+<li>Repeat Purchase Rate Definition: Buyers with ≥2 orders ÷ all buyers. Columns: BUYER_ORDERS by BUYER_ID. Why: Early loyalty signal; drives engagement via tiers.</li>
 
-Repeat Purchase Rate Definition: Buyers with ≥2 orders ÷ all buyers. Columns: BUYER_ORDERS by BUYER_ID. Why: Early loyalty signal; drives engagement via tiers.
+<li>On-Time Delivery Rate Definition: Orders delivered within SLA (proxy: time from ORDER_DATE to DELIVERED). Columns: SELLER_ORDERS.ORDER_DATE, STATUS. Why: Differentiator for next-day Lagos delivery; measures promises.</li>
 
-On-Time Delivery Rate Definition: Orders delivered within SLA (proxy: time from ORDER_DATE to DELIVERED). Columns: SELLER_ORDERS.ORDER_DATE, STATUS. Why: Differentiator for next-day Lagos delivery; measures promises.
+<li>Net Revenue (Post-Refunds) Definition: Sum of delivered TOTAL_AMOUNT minus refunds. Columns: SELLER_ORDERS.TOTAL_AMOUNT, ESCROW_WALLETS.STATUS IN ('REFUNDED_TO_BUYER'). Why: True top-line metric; accounts for disputes.</li>
 
-Net Revenue (Post-Refunds) Definition: Sum of delivered TOTAL_AMOUNT minus refunds. Columns: SELLER_ORDERS.TOTAL_AMOUNT, ESCROW_WALLETS.STATUS IN ('REFUNDED_TO_BUYER'). Why: True top-line metric; accounts for disputes.
-
-Seller Quality Index (SQI) Definition: Weighted composite of ratings, return rates, and delivery success. Columns: SELLER_REVIEWS.RATING, ESCROW_WALLETS.STATUS, SELLER_ORDERS.STATUS. Why: Ensures curated marketplace; informs merchandising and payouts.
-
+<li>Seller Quality Index (SQI) Definition: Weighted composite of ratings, return rates, and delivery success. Columns: SELLER_REVIEWS.RATING, ESCROW_WALLETS.STATUS, SELLER_ORDERS.STATUS. Why: Ensures curated marketplace; informs merchandising and payouts.</li>
+</ul>
 Tip for Two Slides: Slide 1: Names + definitions. Slide 2: Why + schema sources. Research benchmarks (e.g., 2-3% average conversion) for credibility.
 
-Why This Step Matters
+<h4>Why This Step Matters</h4>
 Metrics turn goals into narratives, providing plot points like "AOV rose 12% post-recommendations." Clear definitions avoid ambiguity, linking data to impact. They create a shared language, moving from vague "success" to specific insights, fostering focus on high-value areas like retention.
 
 
-Step 3: Constructing an Entity-Relationship Diagram (ERD) – Mapping Data Relationships
+<h2>Step 3: Constructing an Entity-Relationship Diagram (ERD) – Mapping Data Relationships</h2>
 Use the SQL schema to visualize connections. Tools: Draw.io (as in the .drawio file).
+<ul>
+<li>Identify Entities: Tables like SELLERS (SELLER_ID), BUYERS (BUYER_ID), PRODUCTS (PRODUCT_ID), BUYER_ORDERS, SELLER_ORDERS, ESCROW_WALLETS.</li>
 
-Identify Entities: Tables like SELLERS (SELLER_ID), BUYERS (BUYER_ID), PRODUCTS (PRODUCT_ID), BUYER_ORDERS, SELLER_ORDERS, ESCROW_WALLETS.
+<li>Define Attributes: Key fields, e.g., SELLERS.EMAIL (unique), PRODUCTS.STOCK_QTY, ESCROW_WALLETS.STATUS (e.g., HELD, RELEASED_TO_SELLER).</li>
 
-Define Attributes: Key fields, e.g., SELLERS.EMAIL (unique), PRODUCTS.STOCK_QTY, ESCROW_WALLETS.STATUS (e.g., HELD, RELEASED_TO_SELLER).
+<li>Map Relationships: One-to-Many: SELLER → PRODUCTS (via SELLER_ID FK). Many-to-Many: BUYERS → ORDERS → PRODUCTS (via ORDER_ITEMS). One-to-One: ESCROW_WALLETS ties to ORDERS. Cross: EMPLOYEES link to disputes via EMPLOYEE_ID in ESCROW_WALLETS.</li>
 
-Map Relationships: One-to-Many: SELLER → PRODUCTS (via SELLER_ID FK). Many-to-Many: BUYERS → ORDERS → PRODUCTS (via ORDER_ITEMS). One-to-One: ESCROW_WALLETS ties to ORDERS. Cross: EMPLOYEES link to disputes via EMPLOYEE_ID in ESCROW_WALLETS.
+<li>Visualize: Rectangles for entities, crows-foot for cardinalities (1—∞). Include PK/FK, constraints (e.g., CHECK on ratings 1-5).</li>
 
-Visualize: Rectangles for entities, crows-foot for cardinalities (1—∞). Include PK/FK, constraints (e.g., CHECK on ratings 1-5).
-
-Iterate: Sketch, digitize, validate against schema (3-5 hours).
-
+<li>Iterate: Sketch, digitize, validate against schema (3-5 hours).</li>
+</ul>
 Core highlights: ESCROW_WALLETS as trust hub; separate buyer/seller order views; employee ops for governance.
 
-Why This Step Matters
+<h4>Why This Step Matters</h4>
 The ERD is the "map" for stories—e.g., joining BUYERS and ORDERS reveals retention tales. It prevents silos, enables holistic queries, and ensures integrity. It's essential for accurate queries, onboarding, and scaling analyses.
 
 
-Conclusion: The Story Ahead
+<h2>Conclusion: The Story Ahead</h2>
 Week 1 task was a brilliantly designed introduction to the world of data analytics. It forced a methodical process:
+<ul>
+<li>First, understand the "Why" (The Business).</li>
 
-First, understand the "Why" (The Business).
+<li>Then, define "What" to measure (The Metrics).</li>
 
-Then, define "What" to measure (The Metrics).
-
-Finally, learn "Where" the data lives (The ERD).
+<li>Finally, learn "Where" the data lives (The ERD).</li>
+</ul>
